@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dart Anzeige</title>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(to bottom right, #ffffff, #8a2be2);
+        color: black;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .welcome {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .welcome .line1 {
+        font-size: 6vw;
+        font-weight: bold;
+    }
+
+    .welcome .line2 {
+        font-size: 4.5vw;
+        margin-top: 5px;
+    }
+
+    .scoreboard {
+        width: 100%;
+        max-width: 600px;
+        margin-top: 30px;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+    }
+
+    .team {
+        text-align: center;
+        flex: 1;
+    }
+
+    .team-name {
+        font-size: 5vw;
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .score {
+        font-size: 12vw;
+        margin-top: 10px;
+    }
+
+    #status {
+        margin-top: 30px;
+        font-size: 4vw;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .logo {
+        width: 120px;
+        margin-top: auto;
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+<body>
+
+<div class="welcome">
+    <div class="line1">Herzlich Willkommen</div>
+    <div class="line2">Palinka United</div>
+</div>
+
+<div class="scoreboard">
+    <div class="team">
+        <div class="team-name" id="name-home">Heim</div>
+        <div class="score" id="score-home">0</div>
+    </div>
+
+    <div class="team">
+        <div class="team-name" id="name-guest">Gast</div>
+        <div class="score" id="score-guest">0</div>
+    </div>
+</div>
+
+<div id="status"></div>
+
+<img src="logo.png" class="logo" alt="Logo" />
+
+<script>
+// Diese Seite wird später per Firebase live aktualisiert.
+// Platzhalter Funktionen:
+function updateDisplay(data){
+    document.getElementById("name-home").textContent = data.homeName;
+    document.getElementById("name-guest").textContent = data.guestName;
+    document.getElementById("score-home").textContent = data.homeScore;
+    document.getElementById("score-guest").textContent = data.guestScore;
+    document.getElementById("status").textContent = data.status;
+}
+</script>
+
+</body>
+</html>
