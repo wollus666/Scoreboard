@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Controller – Geschützt</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+    }
+
+    #loginBox {
+        background: rgba(255,255,255,0.08);
+        padding: 25px;
+        border-radius: 15px;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        text-align: center;
+        width: 320px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        border: none;
+        border-radius: 8px;
+        font-size: 18px;
+    }
+
+    button {
+        margin-top: 15px;
+        width: 100%;
+        padding: 12px;
+        font-size: 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    #controllerContent {
+        display: none; /* erst nach Login sichtbar */
+        padding: 20px;
+    }
+
+    #logoutBtn {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        padding: 10px 20px;
+        background: #444;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        display: none; /* erst nach Login sichtbar */
+    }
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginBox">
+    <h2>Controller Login</h2>
+    <input type="password" id="pw" placeholder="Passwort eingeben">
+    <button onclick="checkPW()">Login</button>
+    <p id="error" style="color:#f55;"></p>
+</div>
+
+<!-- LOGOUT-BUTTON -->
+<button id="logoutBtn" onclick="logout()">Logout</button>
+
+<!-- CONTROLLER-SEITE -->
+<div id="controllerContent">
+
+    <!-- 🔻🔻🔻 HIER DEINE EXISTIERENDE CONTROLLER-SEITE EINSETZEN 🔻🔻🔻 -->
+    
+    <!-- Beispiel -->
+    <!-- <h1>Controller</h1> -->
+    <!-- deine Buttons, Slider, Layouts, WebSockets, JS usw. -->
+    
+    <!-- 🔺🔺🔺 BIS HIERHIN 🔺🔺🔺 -->
+
+</div>
+
+<script>
+    const correctPassword = "DEIN_PASSWORT_HIER"; // ← Passwort hier setzen
+    const lockTime = 15 * 60 * 1000; // 15 Minuten (optional)
+
+    let autoLockTimer;
+
+    function startAutoLockTimer() {
+        clearTimeout(autoLockTimer);
+        autoLockTimer = setTimeout(() => {
+            logout();
+            alert("Automatisch ausgeloggt.");
+        }, lockTime);
+    }
+
+    function checkPW() {
+        const input = document.getElementById("pw").value;
+
+        if (input === correctPassword) {
+            document.getElementById("loginBox").style.display = "none";
+            document.getElementById("controllerContent").style.display = "block";
+            document.getElementById("logoutBtn").style.display = "block";
+
+            startAutoLockTimer();
+        } else {
+            document.getElementById("error").textContent = "Falsches Passwort.";
+        }
+    }
+
+    function logout() {
+        document.getElementById("controllerContent").style.display = "none";
+        document.getElementById("logoutBtn").style.display = "none";
+        document.getElementById("loginBox").style.display = "block";
+
+        document.getElementById("pw").value = "";
+        document.getElementById("error").textContent = "";
+
+        clearTimeout(autoLockTimer);
+    }
+
+    // Neu: Jede Maus-/Toucheingabe verlängert die Sitzung
+    window.addEventListener("mousemove", startAutoLockTimer);
+    window.addEventListener("touchstart", startAutoLockTimer);
+</script>
+
+</body>
+</html>
