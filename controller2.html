@@ -83,13 +83,128 @@
 <!-- CONTROLLER-SEITE -->
 <div id="controllerContent">
 
-    <!-- 🔻🔻🔻 HIER DEINE EXISTIERENDE CONTROLLER-SEITE EINSETZEN 🔻🔻🔻 -->
-    
-    <!-- Beispiel -->
-    <!-- <h1>Controller</h1> -->
-    <!-- deine Buttons, Slider, Layouts, WebSockets, JS usw. -->
-    
-    <!-- 🔺🔺🔺 BIS HIERHIN 🔺🔺🔺 -->
+   <!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dart Controller</title>
+<style>
+  html,body { height:100%; margin:0; font-family:Arial; }
+  body { display:flex; flex-direction:column; gap:12px; padding:16px; box-sizing:border-box; }
+  h1,h2 { margin:6px 0; font-weight:700; }
+  input { font-size:1.1rem; padding:8px; width:100%; box-sizing:border-box; }
+  .row { display:flex; gap:8px; }
+  button { font-size:1.1rem; padding:10px 14px; cursor:pointer; }
+  .big { font-size:1.6rem; padding:12px 18px; }
+  .col { display:flex; flex-direction:column; gap:8px; }
+</style>
+</head>
+<body>
+
+<h1>Dart Controller</h1>
+
+<section>
+  <h2>Teamnamen</h2>
+  <input id="homeName" placeholder="Heim (z. B. Palinka United)">
+  <input id="guestName" placeholder="Gast">
+  <div class="row">
+    <button onclick="saveName()" class="big">Namen speichern</button>
+    <button onclick="resetGame()">Reset Spiel</button>
+  </div>
+</section>
+
+<section>
+  <h2>Punkte steuern</h2>
+  <div class="row">
+    <div class="col" style="flex:1;">
+      <div><strong>Heim</strong></div>
+      <div class="row">
+        <button onclick="changeScore('home',-1)">-</button>
+        <button onclick="changeScore('home',1)" class="big">+</button>
+      </div>
+    </div>
+
+    <div class="col" style="flex:1;">
+      <div><strong>Gast</strong></div>
+      <div class="row">
+        <button onclick="changeScore('guest',-1)">-</button>
+        <button onclick="changeScore('guest',1)" class="big">+</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Aktueller Stand</h2>
+  <div id="liveStatus">lade…</div>
+</section>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+  import { getDatabase, ref, update, get, onValue, set } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyARQ_bVlWn01IcHwwYPzkmirpMV2J-0JuQ",
+  authDomain: "palinka-scoreboard.firebaseapp.com",
+  databaseURL: "https://palinka-scoreboard-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "palinka-scoreboard",
+  storageBucket: "palinka-scoreboard.firebasestorage.app",
+  messagingSenderId: "164854231094",
+  appId: "1:164854231094:web:daaca6f0f31c6f64d8e897"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const gameRef = ref(db, "dartGame");
+
+  onValue(gameRef, snap => {
+    const d = snap.val() || { home:0, guest:0, homeName:"Heim", guestName:"Gast", status:"" };
+    document.getElementById("liveStatus").innerText = `${d.homeName} ${d.home} : ${d.guest} ${d.guestName} ${d.status ?? ""}`;
+    document.getElementById("homeName").value = d.homeName ?? "";
+    document.getElementById("guestName").value = d.guestName ?? "";
+  });
+
+  async function changeScore(team, delta) {
+    const snap = await get(gameRef);
+    let d = snap.val() || { home:0, guest:0, homeName:"Heim", guestName:"Gast", status:"" };
+
+    if (team === 'home') d.home = (d.home ?? 0) + delta;
+    else d.guest = (d.guest ?? 0) + delta;
+
+    if (d.home < 0) d.home = 0;
+    if (d.guest < 0) d.guest = 0;
+
+    let total = d.home + d.guest;
+    d.status = "";
+
+    if (total >= 18) {
+      if (d.home > d.guest) d.status = `Gewinner: ${d.homeName} ${d.home}:${d.guest}`;
+      else if (d.guest > d.home) d.status = `Gewinner: ${d.guestName} ${d.home}:${d.guest}`;
+      else d.status = `Sudden Death! Stand: ${d.home}:${d.guest}`;
+    } else if (d.home === 9 && d.guest === 9) {
+      d.status = `Sudden Death – 9 : 9`;
+    }
+
+    await update(gameRef, { home: d.home, guest: d.guest, status: d.status });
+  }
+
+  async function saveName() {
+    const home = document.getElementById("homeName").value || "Heim";
+    const guest = document.getElementById("guestName").value || "Gast";
+    await update(gameRef, { homeName: home, guestName: guest });
+  }
+
+  async function resetGame() {
+    await set(gameRef, { home:0, guest:0, homeName:"Heim", guestName:"Gast", status:"" });
+  }
+
+  window.changeScore = changeScore;
+  window.saveName = saveName;
+  window.resetGame = resetGame;
+</script>
+</body>
+</html>
 
 </div>
 
