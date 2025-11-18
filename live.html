@@ -140,6 +140,25 @@
     }
   });
 </script>
+<script>
+let lineup = {};
+
+function receiveLineupUpdate(d) {
+    lineup = d;
+    updateLineup();
+}
+
+function updateLineup() {
+    document.getElementById("p1").textContent = lineup.p1;
+    document.getElementById("p2").textContent = lineup.p2;
+    document.getElementById("p3").textContent = lineup.p3;
+    document.getElementById("p4").textContent = lineup.p4;
+    document.getElementById("s1").textContent = lineup.s1;
+    document.getElementById("s2").textContent = lineup.s2;
+    document.getElementById("t1").textContent = lineup.t1;
+    document.getElementById("t2").textContent = lineup.t2;
+}
+</script>
 
 
 </body>
