@@ -209,6 +209,76 @@
 </div>
 
 <script>
+// komplette Spielerliste
+const spielerListe = [
+    "Kevin",
+    "Marco",
+    "Daniel",
+    "Patrick",
+    "Stefan",
+    "Dominik"
+];
+
+// Dropdowns für Spieler (alle dürfen gewählt werden)
+function fillDropdown(id) {
+    const sel = document.getElementById(id);
+    sel.innerHTML = "";
+    sel.add(new Option("-", ""));
+    spielerListe.forEach(s => sel.add(new Option(s, s)));
+}
+
+// Teams aber **nur aus Hauptspielern**
+function fillTeamDropdown(id) {
+    const sel = document.getElementById(id);
+    sel.innerHTML = "";
+    sel.add(new Option("-", ""));
+
+    const combos = [];
+
+    // NUR die ersten vier Spieler nehmen (Index 0–3)
+    for (let i = 0; i < 4; i++) {
+        for (let j = i + 1; j < 4; j++) {
+            combos.push(spielerListe[i] + " / " + spielerListe[j]);
+        }
+    }
+
+    combos.forEach(c => sel.add(new Option(c, c)));
+}
+
+window.onload = () => {
+    // Spieler-Dropdowns (alle auswählbar)
+    fillDropdown("p1");
+    fillDropdown("p2");
+    fillDropdown("p3");
+    fillDropdown("p4");
+    fillDropdown("s1");
+    fillDropdown("s2");
+
+    // Team-Dropdowns (nur 1–4)
+    fillTeamDropdown("t1");
+    fillTeamDropdown("t2");
+};
+
+// Daten an Anzeige senden
+function sendLineup() {
+    const data = {
+        p1: document.getElementById("p1").value,
+        p2: document.getElementById("p2").value,
+        p3: document.getElementById("p3").value,
+        p4: document.getElementById("p4").value,
+        s1: document.getElementById("s1").value,
+        s2: document.getElementById("s2").value,
+        t1: document.getElementById("t1").value,
+        t2: document.getElementById("t2").value
+    };
+
+    if (window.opener && window.opener.receiveLineupUpdate) {
+        window.opener.receiveLineupUpdate(data);
+    }
+}
+</script>
+
+<script>
     const correctPassword = "Dart2025"; // ← Passwort hier setzen
     const lockTime = 15 * 60 * 1000; // 15 Minuten (optional)
 
