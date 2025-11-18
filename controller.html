@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <title>Controller – Geschützt</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -27,13 +27,14 @@
         transform: translate(-50%, -50%);
     }
 
-    input {
+    input, select {
         width: 100%;
         padding: 12px;
         margin-top: 15px;
         border: none;
         border-radius: 8px;
         font-size: 18px;
+        box-sizing: border-box;
     }
 
     button {
@@ -53,7 +54,7 @@
 
     #logoutBtn {
         position: fixed;
-        top: 600px;
+        top: 15px;
         right: 15px;
         padding: 10px 20px;
         background: #444;
@@ -64,9 +65,17 @@
         font-size: 16px;
         display: none; /* erst nach Login sichtbar */
     }
+
+    h1, h2 {
+        margin: 6px 0;
+        font-weight: 700;
+    }
+
+    .row { display:flex; gap:8px; flex-wrap: wrap; }
+    .col { display:flex; flex-direction:column; gap:8px; flex:1; }
+    .big { font-size:1.2rem; padding:10px; flex:1; }
 </style>
 </head>
-
 <body>
 
 <!-- LOGIN -->
@@ -83,92 +92,86 @@
 <!-- CONTROLLER-SEITE -->
 <div id="controllerContent">
 
-   <!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dart Controller</title>
-<style>
-  html,body { height:100%; margin:0; font-family:Arial; }
-  body { display:flex; flex-direction:column; gap:12px; padding:16px; box-sizing:border-box; }
-  h1,h2 { margin:6px 0; font-weight:700; }
-  input { font-size:1.1rem; padding:8px; width:100%; box-sizing:border-box; }
-  .row { display:flex; gap:8px; }
-  button { font-size:1.1rem; padding:10px 14px; cursor:pointer; }
-  .big { font-size:1.6rem; padding:12px 18px; }
-  .col { display:flex; flex-direction:column; gap:8px; }
-</style>
-</head>
-<body>
-
 <h1>Dart Controller</h1>
 
 <section>
-  <h2>Teamnamen</h2>
-  <input id="homeName" placeholder="Heim (z. B. Palinka United)">
-  <input id="guestName" placeholder="Gast">
-  <div class="row">
-    <button onclick="saveName()" class="big">Namen speichern</button>
-    <button onclick="resetGame()">Reset Spiel</button>
-  </div>
+    <h2>Teamnamen</h2>
+    <input id="homeName" placeholder="Heim (z. B. Palinka United)">
+    <input id="guestName" placeholder="Gast">
+    <div class="row">
+        <button onclick="saveName()" class="big">Namen speichern</button>
+        <button onclick="resetGame()" class="big">Reset Spiel</button>
+    </div>
 </section>
 
 <section>
-  <h2>Punkte steuern</h2>
-  <div class="row">
-    <div class="col" style="flex:1;">
-      <div><strong>Heim</strong></div>
-      <div class="row">
-        <button onclick="changeScore('home',-1)">-</button>
-        <button onclick="changeScore('home',1)" class="big">+</button>
-      </div>
+    <h2>Punkte steuern</h2>
+    <div class="row">
+        <div class="col">
+            <div><strong>Heim</strong></div>
+            <div class="row">
+                <button onclick="changeScore('home',-1)">-</button>
+                <button onclick="changeScore('home',1)" class="big">+</button>
+            </div>
+        </div>
+        <div class="col">
+            <div><strong>Gast</strong></div>
+            <div class="row">
+                <button onclick="changeScore('guest',-1)">-</button>
+                <button onclick="changeScore('guest',1)" class="big">+</button>
+            </div>
+        </div>
     </div>
-
-    <div class="col" style="flex:1;">
-      <div><strong>Gast</strong></div>
-      <div class="row">
-        <button onclick="changeScore('guest',-1)">-</button>
-        <button onclick="changeScore('guest',1)" class="big">+</button>
-      </div>
-    </div>
-  </div>
 </section>
 
 <section>
-  <h2>Aktueller Stand</h2>
-  <div id="liveStatus">lade…</div>
+    <h2>Aktueller Stand</h2>
+    <div id="liveStatus">lade…</div>
 </section>
+
+<section>
+    <h2>Spieler auswählen</h2>
+    <select id="p1"></select>
+    <select id="p2"></select>
+    <select id="p3"></select>
+    <select id="p4"></select>
+    <select id="s1"></select>
+    <select id="s2"></select>
+    <select id="t1"></select>
+    <select id="t2"></select>
+    <button onclick="sendLineup()" class="big">Lineup senden</button>
+</section>
+
+</div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
-  import { getDatabase, ref, update, get, onValue, set } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+import { getDatabase, ref, update, get, onValue, set } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
 
-  const firebaseConfig = {
-  apiKey: "AIzaSyARQ_bVlWn01IcHwwYPzkmirpMV2J-0JuQ",
-  authDomain: "palinka-scoreboard.firebaseapp.com",
-  databaseURL: "https://palinka-scoreboard-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "palinka-scoreboard",
-  storageBucket: "palinka-scoreboard.firebasestorage.app",
-  messagingSenderId: "164854231094",
-  appId: "1:164854231094:web:daaca6f0f31c6f64d8e897"
-  };
+const firebaseConfig = {
+    apiKey: "AIzaSyARQ_bVlWn01IcHwwYPzkmirpMV2J-0JuQ",
+    authDomain: "palinka-scoreboard.firebaseapp.com",
+    databaseURL: "https://palinka-scoreboard-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "palinka-scoreboard",
+    storageBucket: "palinka-scoreboard.appspot.com",
+    messagingSenderId: "164854231094",
+    appId: "1:164854231094:web:daaca6f0f31c6f64d8e897"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const gameRef = ref(db, "dartGame");
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const gameRef = ref(db, "dartGame");
 
-  onValue(gameRef, snap => {
+onValue(gameRef, snap => {
     const d = snap.val() || { home:0, guest:0, homeName:"Heim", guestName:"Gast", status:"" };
     document.getElementById("liveStatus").innerText = `${d.homeName} ${d.home} : ${d.guest} ${d.guestName} ${d.status ?? ""}`;
     document.getElementById("homeName").value = d.homeName ?? "";
     document.getElementById("guestName").value = d.guestName ?? "";
-  });
+});
 
-  async function changeScore(team, delta) {
+async function changeScore(team, delta) {
     const snap = await get(gameRef);
     let d = snap.val() || { home:0, guest:0, homeName:"Heim", guestName:"Gast", status:"" };
-
     if (team === 'home') d.home = (d.home ?? 0) + delta;
     else d.guest = (d.guest ?? 0) + delta;
 
@@ -177,40 +180,31 @@
 
     let total = d.home + d.guest;
     d.status = "";
-
     if (total >= 18) {
-      if (d.home > d.guest) d.status = `Gewinner: ${d.homeName} ${d.home}:${d.guest}`;
-      else if (d.guest > d.home) d.status = `Gewinner: ${d.guestName} ${d.home}:${d.guest}`;
-      else d.status = `Sudden Death! Stand: ${d.home}:${d.guest}`;
+        if (d.home > d.guest) d.status = `Gewinner: ${d.homeName} ${d.home}:${d.guest}`;
+        else if (d.guest > d.home) d.status = `Gewinner: ${d.guestName} ${d.home}:${d.guest}`;
+        else d.status = `Sudden Death! Stand: ${d.home}:${d.guest}`;
     } else if (d.home === 9 && d.guest === 9) {
-      d.status = `Sudden Death – 9 : 9`;
+        d.status = `Sudden Death – 9 : 9`;
     }
 
     await update(gameRef, { home: d.home, guest: d.guest, status: d.status });
-  }
+}
 
-  async function saveName() {
+async function saveName() {
     const home = document.getElementById("homeName").value || "Heim";
     const guest = document.getElementById("guestName").value || "Gast";
     await update(gameRef, { homeName: home, guestName: guest });
-  }
+}
 
-  async function resetGame() {
+async function resetGame() {
     await set(gameRef, { home:0, guest:0, homeName:"Heim", guestName:"Gast", status:"" });
-  }
-    // komplette Spielerliste
-const spielerListe = [
-    "Mailman",
-    "Surferboy",
-    "PalinkaJames",
-    "Diva",
-    "The Bucher",
-    "Koffi",
-    "Hearthbreaker",
-    "Carmaster",
-];
+}
 
-// Dropdowns für Spieler (alle dürfen gewählt werden)
+// Spieler-Liste
+const spielerListe = ["Mailman","Surferboy","PalinkaJames","Diva","The Bucher","Koffi","Hearthbreaker","Carmaster"];
+
+// Dropdowns für alle Spieler
 function fillDropdown(id) {
     const sel = document.getElementById(id);
     sel.innerHTML = "";
@@ -218,39 +212,27 @@ function fillDropdown(id) {
     spielerListe.forEach(s => sel.add(new Option(s, s)));
 }
 
-// Teams aber **nur aus Hauptspielern**
+// Team-Dropdowns (nur erste 4 Spieler)
 function fillTeamDropdown(id) {
     const sel = document.getElementById(id);
     sel.innerHTML = "";
     sel.add(new Option("-", ""));
-
     const combos = [];
-
-    // NUR die ersten vier Spieler nehmen (Index 0–3)
     for (let i = 0; i < 4; i++) {
         for (let j = i + 1; j < 4; j++) {
             combos.push(spielerListe[i] + " / " + spielerListe[j]);
         }
     }
-
     combos.forEach(c => sel.add(new Option(c, c)));
 }
 
 window.onload = () => {
-    // Spieler-Dropdowns (alle auswählbar)
-    fillDropdown("p1");
-    fillDropdown("p2");
-    fillDropdown("p3");
-    fillDropdown("p4");
-    fillDropdown("s1");
-    fillDropdown("s2");
-
-    // Team-Dropdowns (nur 1–4)
-    fillTeamDropdown("t1");
-    fillTeamDropdown("t2");
+    fillDropdown("p1"); fillDropdown("p2"); fillDropdown("p3"); fillDropdown("p4");
+    fillDropdown("s1"); fillDropdown("s2");
+    fillTeamDropdown("t1"); fillTeamDropdown("t2");
 };
 
-// Daten an Anzeige senden
+// Lineup an Hauptfenster senden
 function sendLineup() {
     const data = {
         p1: document.getElementById("p1").value,
@@ -262,63 +244,50 @@ function sendLineup() {
         t1: document.getElementById("t1").value,
         t2: document.getElementById("t2").value
     };
-
     if (window.opener && window.opener.receiveLineupUpdate) {
         window.opener.receiveLineupUpdate(data);
     }
 }
 
-  window.changeScore = changeScore;
-  window.saveName = saveName;
-  window.resetGame = resetGame;
+window.changeScore = changeScore;
+window.saveName = saveName;
+window.resetGame = resetGame;
 </script>
-</body>
-</html>
-
-</div>
 
 <script>
-    const correctPassword = "Dart2025"; // ← Passwort hier setzen
-    const lockTime = 15 * 60 * 1000; // 15 Minuten (optional)
+const correctPassword = "Dart2025"; // Passwort
+const lockTime = 15*60*1000; // 15 Minuten
+let autoLockTimer;
 
-    let autoLockTimer;
+function startAutoLockTimer() {
+    clearTimeout(autoLockTimer);
+    autoLockTimer = setTimeout(() => { logout(); alert("Automatisch ausgeloggt."); }, lockTime);
+}
 
-    function startAutoLockTimer() {
-        clearTimeout(autoLockTimer);
-        autoLockTimer = setTimeout(() => {
-            logout();
-            alert("Automatisch ausgeloggt.");
-        }, lockTime);
+function checkPW() {
+    const input = document.getElementById("pw").value;
+    if(input === correctPassword){
+        document.getElementById("loginBox").style.display="none";
+        document.getElementById("controllerContent").style.display="block";
+        document.getElementById("logoutBtn").style.display="block";
+        startAutoLockTimer();
+    } else {
+        document.getElementById("error").textContent="Falsches Passwort.";
     }
+}
 
-    function checkPW() {
-        const input = document.getElementById("pw").value;
+function logout() {
+    document.getElementById("controllerContent").style.display="none";
+    document.getElementById("logoutBtn").style.display="none";
+    document.getElementById("loginBox").style.display="block";
+    document.getElementById("pw").value="";
+    document.getElementById("error").textContent="";
+    clearTimeout(autoLockTimer);
+}
 
-        if (input === correctPassword) {
-            document.getElementById("loginBox").style.display = "none";
-            document.getElementById("controllerContent").style.display = "block";
-            document.getElementById("logoutBtn").style.display = "block";
-
-            startAutoLockTimer();
-        } else {
-            document.getElementById("error").textContent = "Falsches Passwort.";
-        }
-    }
-
-    function logout() {
-        document.getElementById("controllerContent").style.display = "none";
-        document.getElementById("logoutBtn").style.display = "none";
-        document.getElementById("loginBox").style.display = "block";
-
-        document.getElementById("pw").value = "";
-        document.getElementById("error").textContent = "";
-
-        clearTimeout(autoLockTimer);
-    }
-
-    // Neu: Jede Maus-/Toucheingabe verlängert die Sitzung
-    window.addEventListener("mousemove", startAutoLockTimer);
-    window.addEventListener("touchstart", startAutoLockTimer);
+// Maus/Toucheingaben verlängern Session
+window.addEventListener("mousemove", startAutoLockTimer);
+window.addEventListener("touchstart", startAutoLockTimer);
 </script>
 
 </body>
