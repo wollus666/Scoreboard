@@ -198,18 +198,7 @@
   async function resetGame() {
     await set(gameRef, { home:0, guest:0, homeName:"Heim", guestName:"Gast", status:"" });
   }
-
-  window.changeScore = changeScore;
-  window.saveName = saveName;
-  window.resetGame = resetGame;
-</script>
-</body>
-</html>
-
-</div>
-
-<script>
-// komplette Spielerliste
+    // komplette Spielerliste
 const spielerListe = [
     "Mailman",
     "Surferboy",
@@ -278,7 +267,15 @@ function sendLineup() {
         window.opener.receiveLineupUpdate(data);
     }
 }
+
+  window.changeScore = changeScore;
+  window.saveName = saveName;
+  window.resetGame = resetGame;
 </script>
+</body>
+</html>
+
+</div>
 
 <script>
     const correctPassword = "Dart2025"; // ← Passwort hier setzen
